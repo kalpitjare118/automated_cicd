@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mern-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mern-app
+  template:
+    metadata:
+      labels:
+        app: mern-app
+    spec:
+      containers:
+      - name: mern-app
+        image: your-app-image  # Docker image built in CI
+        ports:
+        - containerPort: 3000
