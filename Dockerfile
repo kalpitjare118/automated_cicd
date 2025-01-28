@@ -1,5 +1,5 @@
 # Install dependencies for both frontend and backend
-FROM node:16
+FROM node:18
 
 # Set working directory
 WORKDIR /app
