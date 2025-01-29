@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-        label 'windows' // Ensure Jenkins has a Windows agent with this label
-    }
+    agent any
 
     environment {
         DOCKER_IMAGE = "myapp:latest"
