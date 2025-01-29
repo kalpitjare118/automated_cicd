@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         DOCKER_IMAGE = 'autocicd'   // Ensure this is correctly set
-        DOCKER_CREDENTIALS_ID = 'your-credentials-id' // Set your Docker credentials ID
+        DOCKER_CREDENTIALS_ID = 'docker-cred' // Set your Docker credentials ID
     }
     stages {
         stage('Checkout') {
