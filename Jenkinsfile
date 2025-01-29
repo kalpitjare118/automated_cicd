@@ -1,58 +1,55 @@
 pipeline {
-    agent any
-    environment {
-        DOCKER_IMAGE = 'autocicd'   // Ensure this is correctly set
-        DOCKER_CREDENTIALS_ID = 'docker-cred' // Set your Docker credentials ID
+    agent {
+        label 'windows' // Ensure Jenkins has a Windows agent with this label
     }
+
+    environment {
+        DOCKER_IMAGE = "myapp:latest"
+        REGISTRY_URL = "mydockerhub"
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                echo 'Checking out source code...'
-                checkout scm
+                git 'https://github.com/kalpitjare118/automated_cicd' // Replace with your repo URL
             }
         }
-        stage('Install Dependencies') {
+
+        stage('Build') {
             steps {
-                echo 'Installing dependencies...'
-                bat 'npm install'
+                bat 'mvn clean package' // Adjust for your build tool
             }
         }
-        stage('Debug Dependencies') {
+
+        stage('Docker Build') {
             steps {
-                echo 'Debugging dependencies to verify Jest is installed...'
-                bat 'npm list jest'
+                bat 'docker build -t %DOCKER_IMAGE% .' 
             }
         }
-        stage('Build Application') {
+
+        stage('Docker Login') {
             steps {
-                echo 'Building the application...'
-                bat 'npm run build'
+                bat 'docker login -u myusername -p mypassword %REGISTRY_URL%'
             }
         }
-        stage('Run Tests') {
+
+        stage('Push to Registry') {
             steps {
-                echo 'Running tests...'
-                bat 'npx jest --passWithNoTests'
+                bat 'docker tag %DOCKER_IMAGE% %REGISTRY_URL%/%DOCKER_IMAGE%'
+                bat 'docker push %REGISTRY_URL%/%DOCKER_IMAGE%'
             }
         }
-        stage('Docker Build & Push') {
+
+        stage('Deploy') {
             steps {
-                script {
-                    def dockerImage = docker.build("${DOCKER_IMAGE}")
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
-                        dockerImage.push()
-                    }
-                }
+                bat 'docker run -d -p 8080:8080 %DOCKER_IMAGE%'
             }
         }
     }
+
     post {
-        always {
-            echo 'Cleaning up workspace...'
-            cleanWs()
-        }
         success {
-            echo 'Build succeeded!'
+            echo 'Build and deployment successful!'
         }
         failure {
             echo 'Build failed!'
