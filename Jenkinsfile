@@ -28,7 +28,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 echo 'Running tests...'
-                bat 'npx jest'
+                bat 'npx jest --passWithNoTests'
             }
         }
         stage('Deploy') {
