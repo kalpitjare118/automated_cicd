@@ -13,9 +13,15 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Install Dependencies') {
             steps {
-                bat 'mvn clean package' // Adjust for your build tool
+                bat 'npm install'  // Install dependencies using npm
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                bat 'npm run build --prefix client'  // Build the React frontend (assuming the frontend is in a 'client' directory)
             }
         }
 
@@ -27,20 +33,20 @@ pipeline {
 
         stage('Docker Login') {
             steps {
-                bat 'docker login -u myusername -p mypassword %REGISTRY_URL%'
+                bat 'docker login -u myusername -p mypassword %REGISTRY_URL%' 
             }
         }
 
         stage('Push to Registry') {
             steps {
-                bat 'docker tag %DOCKER_IMAGE% %REGISTRY_URL%/%DOCKER_IMAGE%'
-                bat 'docker push %REGISTRY_URL%/%DOCKER_IMAGE%'
+                bat 'docker tag %DOCKER_IMAGE% %REGISTRY_URL%/%DOCKER_IMAGE%' 
+                bat 'docker push %REGISTRY_URL%/%DOCKER_IMAGE%' 
             }
         }
 
         stage('Deploy') {
             steps {
-                bat 'docker run -d -p 8080:8080 %DOCKER_IMAGE%'
+                bat 'docker run -d -p 8080:8080 %DOCKER_IMAGE%'  // Update port mappings as needed
             }
         }
     }
