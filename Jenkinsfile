@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    environment {
+        DOCKER_IMAGE = 'autocicd'   // Ensure this is correctly set
+        DOCKER_CREDENTIALS_ID = 'your-credentials-id' // Set your Docker credentials ID
+    }
     stages {
         stage('Checkout') {
             steps {
@@ -19,7 +23,7 @@ pipeline {
                 bat 'npm list jest'
             }
         }
-        stage('Build') {
+        stage('Build Application') {
             steps {
                 echo 'Building the application...'
                 bat 'npm run build'
@@ -31,18 +35,6 @@ pipeline {
                 bat 'npx jest --passWithNoTests'
             }
         }
-        stage('Run Tests') {
-            steps {
-                echo 'Running tests...'
-                bat 'npx jest --passWithNoTests'
-            }
-        }
-        stage('Build Application') {
-            steps {
-                bat 'npm run build'
-            }
-        }
-
         stage('Docker Build & Push') {
             steps {
                 script {
@@ -53,6 +45,7 @@ pipeline {
                 }
             }
         }
+    }
     post {
         always {
             echo 'Cleaning up workspace...'
