@@ -31,16 +31,28 @@ pipeline {
                 bat 'npx jest --passWithNoTests'
             }
         }
-        stage('Deploy') {
-            when {
-                expression { currentBuild.resultIsBetterOrEqualTo('SUCCESS') }
-            }
+        stage('Run Tests') {
             steps {
-                echo 'Deploying application...'
-                // Add deployment steps here (e.g., copying files, restarting services, etc.)
+                echo 'Running tests...'
+                bat 'npx jest --passWithNoTests'
             }
         }
-    }
+        stage('Build Application') {
+            steps {
+                bat 'npm run build'
+            }
+        }
+
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    def dockerImage = docker.build("${DOCKER_IMAGE}")
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
     post {
         always {
             echo 'Cleaning up workspace...'
