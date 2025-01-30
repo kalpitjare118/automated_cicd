@@ -13,16 +13,21 @@ pipeline {
             }
         }
 
-        stage('Build Backend') {
+        stage('Install Dependencies') {
             steps {
-                bat 'npm install'
-                bat 'npm run build'
+                bat 'npm install' // Install both frontend & backend dependencies
+            }
+        }
+
+        stage('Build Application') {
+            steps {
+                bat 'npm run build' // Build for frontend (Vite) and backend (if applicable)
             }
         }
 
         stage('Docker Build') {
             steps {
-                bat 'docker build -t %DOCKER_IMAGE% .'
+                bat 'docker build -t %DOCKER_IMAGE% .' // Build Docker image
             }
         }
 
@@ -30,16 +35,14 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
-                    }
+                }
             }
         }
 
-
-
         stage('Push to Registry') {
             steps {
-                bat 'docker tag %DOCKER_IMAGE% %REGISTRY_URL%/%DOCKER_IMAGE%'
-                bat 'docker push %REGISTRY_URL%/%DOCKER_IMAGE%'
+                bat 'docker tag %DOCKER_IMAGE% %REGISTRY_URL%/%DOCKER_USER%/%DOCKER_IMAGE%'
+                bat 'docker push %REGISTRY_URL%/%DOCKER_USER%/%DOCKER_IMAGE%'
             }
         }
 
