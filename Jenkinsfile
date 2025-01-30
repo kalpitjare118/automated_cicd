@@ -5,7 +5,7 @@ pipeline {
         DOCKER_IMAGE_NAME = "kalpitjare/your-app"
         DOCKER_IMAGE_TAG = "latest"
         DOCKER_CREDENTIALS_ID = "docker-hub-credentials" // Ensure this matches your Jenkins credentials ID
-        KUBECONFIG = "C:\\Users\\Dell\\.kube\\config" // Use double backslashes or convert to Unix format
+        KUBECONFIG = "C:\\Users\\Dell\\.kube\\config" // Windows-specific path
     }
 
     stages {
@@ -49,6 +49,7 @@ pipeline {
             steps {
                 script {
                     withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
+                        bat 'kubectl config view'
                         bat 'kubectl get nodes'
                     }
                 }
@@ -59,10 +60,8 @@ pipeline {
             steps {
                 script {
                     withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
-                        bat '''
-                        kubectl apply -f deployment.yaml
-                        kubectl apply -f service.yaml
-                        '''
+                        bat 'kubectl apply -f deployment.yaml'
+                        bat 'kubectl apply -f service.yaml'
                     }
                 }
             }
