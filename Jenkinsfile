@@ -5,7 +5,7 @@ pipeline {
         DOCKER_IMAGE_NAME = "kalpit/your-app"
         DOCKER_IMAGE_TAG = "latest"
         DOCKER_CREDENTIALS_ID = "docker-hub-credentials" // Ensure this matches your Jenkins credentials ID
-        KUBECONFIG = "C:\Users\Dell\.kube\config" // Specify the path to the kubeconfig file
+        KUBECONFIG = "C:\\Users\\Dell\\.kube\\config" // Use double backslashes or convert to Unix format
     }
 
     stages {
@@ -39,8 +39,7 @@ pipeline {
                     def dockerImage = docker.build("${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}")
 
                     docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
-                        dockerImage.push()
-                        dockerImage.push('latest') // Push latest tag explicitly
+                        dockerImage.push() // This pushes the image with DOCKER_IMAGE_TAG
                     }
                 }
             }
@@ -49,8 +48,7 @@ pipeline {
         stage('Check Kubernetes Connection') {
             steps {
                 script {
-                    // Ensure kubectl can connect to the cluster
-                    withEnv(['KUBECONFIG=C:\Users\Dell\.kube\config']) {
+                    withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
                         bat 'kubectl get nodes'
                     }
                 }
@@ -60,11 +58,10 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Apply resources to Kubernetes
-                    withEnv(['KUBECONFIG=C:\Users\Dell\.kube\config']) {
+                    withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
                         bat '''
-                        kubectl apply --validate=false -f deployment.yaml
-                        kubectl apply --validate=false -f service.yaml
+                        kubectl apply -f deployment.yaml
+                        kubectl apply -f service.yaml
                         '''
                     }
                 }
