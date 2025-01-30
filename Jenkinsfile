@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE_NAME = "kalpit/your-app"
+        DOCKER_IMAGE_NAME = "kalpitjare/your-app"
         DOCKER_IMAGE_TAG = "latest"
         DOCKER_CREDENTIALS_ID = "docker-hub-credentials" // Ensure this matches your Jenkins credentials ID
         KUBECONFIG = "C:\\Users\\Dell\\.kube\\config" // Use double backslashes or convert to Unix format
