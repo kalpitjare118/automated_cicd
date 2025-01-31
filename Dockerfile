@@ -17,4 +17,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Start the application (e.g., server entry point)
-CMD ["npm", "start"]
+CMD ["node", "server/index.js"]
