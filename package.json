@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "server": "node server/index.js",
     "test": "jest --passWithNoTests",
-    "start": "node server.js"
+    "start": "node server/index.js"
   },
   "dependencies": {
     "axios": "^1.6.7",
